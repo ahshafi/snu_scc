@@ -353,16 +353,7 @@ simple_statement : var_declaration
 		$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$5->name+" "+$6->name+" "+$7->name;
 	  	rule_matched("simple_statement : FOR LPAREN expression_statement expression_statement expression RPAREN simple_statement", $$->name);
 	  }
-	  | IF LPAREN expression 
-	  {
-			string exit_label=new_label();
-			string false_label=new_label();
-			iflabel.push(exit_label);
-			iflabel.push(false_label);
-			code_seg+=jump_if_false(false_label);
-	  } RPAREN 
-	  
-	  simple_statement
+	  | IF LPAREN conditional_expression RPAREN simple_statement
 	  {
 		string false_label=iflabel.top(); iflabel.pop();
 		string exit_label=iflabel.top(); iflabel.pop();
@@ -400,17 +391,32 @@ statement: simple_statement
 		$$->name=$1->name;
 		rule_matched("statement: simple_statement", $$->name);
 	  }
-	  | IF LPAREN expression 
+	  | IF LPAREN conditional_expression RPAREN
+	  simple_statement ELSE 
 	  {
-
-	  } RPAREN
-	  simple_statement ELSE statement
+		string false_label=iflabel.top(); iflabel.pop();
+		string exit_label=iflabel.top();
+		code_seg+=jump(exit_label);
+		code_seg+=false_label+":\n";
+	  }
+	  statement
 	  {
 	  	$$=new SymbolInfo();
 		//$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$6->name+" "+$7->name+" "+$8->name;
 	  	rule_matched("statement : IF LPAREN expression RPAREN simple_statement ELSE statement", $$->name);
+	  	
+		string exit_label=iflabel.top(); iflabel.pop();
+		code_seg+=exit_label+":\n\n";
 	  } 
  	;
+conditional_expression : expression
+			{
+				string exit_label=new_label();
+				string false_label=new_label();
+				iflabel.push(exit_label);
+				iflabel.push(false_label);
+				code_seg+=jump_if_false(false_label);
+	  		}
 expression_statement : SEMICOLON	
 			{
 				$$=new SymbolInfo();
@@ -432,6 +438,7 @@ variable : ID
 			$$=new SymbolInfo();
 			$$->name=$1->name;
 			$$->ret=process_variable($1->name,"VAR");
+			$$->type="VAR";
 			rule_matched("variable : ID", $$->name);
 		}
 	 	| ID LTHIRD expression RTHIRD 
@@ -439,10 +446,13 @@ variable : ID
 			$$=new SymbolInfo();
 			$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name;
 			$$->ret=process_variable($1->name,"VAR_ARRAY");
+			$$->type="VAR_ARRAY";
 			if($3->ret!="CONST_INT" and $3->ret!="DUMMY"){
 				error("non_const_integer used as array subscript in variable: "+$1->name);
 			}
 	  		rule_matched("variable : ID LTHIRD expression RTHIRD", $$->name);
+
+			
 		}
 	 ;
 	 
@@ -473,7 +483,7 @@ expression : logic_expression
 
 	  		rule_matched("expression : variable ASSIGNOP logic_expression", $$->name);
 		
-			code_seg+=assignop($1->name);
+			code_seg+=assignop($1->name, $1->type);
 		}
 	   ;
 			
@@ -649,7 +659,8 @@ factor	: variable
 		$$->ret=$1->ret;
 		rule_matched("factor : variable", $$->name);
 
-		code_seg+=push_var($1->name);
+		if($1->type=="VAR") code_seg+=push_var($1->name);
+		else if($1->type=="VAR_ARRAY") code_seg+=push_varray($1->name);
 	}
 	| ID LPAREN argument_list RPAREN
 	{

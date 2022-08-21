@@ -42,6 +42,18 @@ string push_var(string var)
     string code="MOV AX, "+asm_name+"\nPUSH AX\n\n";
     return code;
 }
+string push_varray(string varray)
+{
+    string var;
+    for(int v: varray) {
+        if(v=='[') { var.pop_back(); break; }
+        else var.push_back(v);
+    }
+
+    string asm_name=st.lookup(var)->lookup(var)->asm_name;
+    string code="LEA SI, "+asm_name+"\nPOP AX\nADD AX, AX\nADD SI, AX\nPUSH [SI]\n\n";
+    return code;
+}
 string push_literal(string val)
 {
     string code="PUSH "+val+"\n\n";
@@ -144,10 +156,19 @@ string relop(string op)
     }
     return code;
 }
-string assignop(string var)
+string assignop(string var, string type)
 {
+    if(type=="VAR_ARRAY"){
+        while(true){
+            if(var.back()=='[') { var.pop_back(), var.pop_back(); break; }
+            var.pop_back();
+        }
+    }
     string asm_name=st.lookup(var)->lookup(var)->asm_name;
-    string code="POP AX\nMOV "+asm_name+", AX\n\n";
+    string code;
+    if(type=="VAR") code="POP AX\nMOV "+asm_name+", AX\nPUSH AX\n\n";
+    else if(type=="VAR_ARRAY") 
+        code="POP BX\nLEA SI, "+asm_name+"\nPOP AX\nADD AX, AX\nADD SI, AX\nMOV [SI], BX\nPUSH BX\n\n";
     return code;
 }
 string jump_if_false(string label)
