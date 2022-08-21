@@ -1,17 +1,10 @@
-int c;
+int fact(int n)
+{
+    if(n==0) return 1;
+    return n*fact(n-1);
+}
 int main()
 {
-    int a[5];
-    a[0]=3;
-    a[1]=2;
-    a[2]=4;
-    a[3]=1;
-    a[4]=2;
-    int i,j,k;
-    for(i=1;i<5;i++) for(j=i;j>0;j--) if(a[j]<a[j-1]) 
-    {
-        k=a[j-1];
-        a[j-1]=a[j];
-        a[j]=k;
-    }
+    int a;
+    a=fact(5);
 }

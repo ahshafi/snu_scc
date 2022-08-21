@@ -116,9 +116,11 @@ func_definition : type_specifier ID LPAREN parameter_list RPAREN
 		{
 			//cout<<"faker\n";
 			process_function_definition($2->name, $1->name, $4->param, $4->pids);
+			
 			generate_declaration($4->pids);
-
 			code_seg+=$2->name+" PROC\n";
+			code_seg+=parapass($4->pids);
+			
 			if($2->name=="main") code_seg+="MOV AX, @DATA\nMOV DS, AX\n";
 		}
 		compound_statement
@@ -127,6 +129,9 @@ func_definition : type_specifier ID LPAREN parameter_list RPAREN
 			$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$5->name+" "+$7->name;
 			rule_matched("func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement", $$->name);
 			
+			if($2->name=="main") code_seg+="MOV AH, 4CH\nINT 21H\n\n";
+			else code_seg+=return_func();
+
 			code_seg+=$2->name+" ENDP\n";
 			if($2->name=="main") code_seg+="END MAIN\n";
 		}
@@ -144,6 +149,9 @@ func_definition : type_specifier ID LPAREN parameter_list RPAREN
 			$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$6->name;
 			rule_matched("func_definition : type_specifier ID LPAREN RPAREN compound_statement", $$->name);
 			
+			if($2->name=="main") code_seg+="MOV AH, 4CH\nINT 21H\n\n";
+			else code_seg+=return_func();
+
 			code_seg+=$2->name+" ENDP\n";
 			if($2->name=="main") code_seg+="END MAIN\n";
 		}
@@ -243,7 +251,7 @@ compound_statement : LCURL
 
 				st.printAll();
 				st.exit();
-				cout<<"exited\n";
+				//cout<<"exited\n";
  		    }
 			
  		    ;
@@ -363,6 +371,7 @@ simple_statement : var_declaration
 		string body_label=forlabel.top(); forlabel.pop();
 		string exit_label=forlabel.top(); forlabel.pop();
 		string loop_label=forlabel.top(); forlabel.pop();
+		code_seg+=unary_pop();
 		code_seg+=jump(loop_label);
 		code_seg+=body_label+":\n";
 		forlabel.push(exit_label), forlabel.push(tail_label);
@@ -423,6 +432,8 @@ simple_statement : var_declaration
 	  	$$=new SymbolInfo();
 		$$->name=$1->name+" "+$2->name+" "+$3->name;
 	  	rule_matched("simple_statement : RETURN expression SEMICOLON", $$->name);
+
+		code_seg+=return_func();
 	  }
 	  ;
 
@@ -746,6 +757,8 @@ factor	: variable
 		$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name;
 		$$->ret=process_function_call($1->name, $3->param);
 	  	rule_matched("factor : ID LPAREN argument_list RPAREN", $$->name);
+
+		code_seg+=call_func($1->name);
 	}
 	| LPAREN expression RPAREN
 	{

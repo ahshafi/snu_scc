@@ -211,4 +211,25 @@ string jump(string label)
     string code="JMP "+label+"\n\n";
     return code;
 }
+string call_func(string func_name)
+{
+    string code="CALL "+func_name+"\n";
+    return code;
+}
+string return_func()
+{
+    string code="POP AX\nPOP BX\nPUSH AX\nPUSH BX\nRET\n\n";
+    return code;
+}
+string parapass(vector<string> pids)
+{
+    reverse(pids.begin(), pids.end());
+    string code="POP AX\n";
+    for(string pid: pids){
+        string asm_name=st.lookup(pid)->lookup(pid)->asm_name;
+        code+="POP "+asm_name+"\n";
+    }
+    code+="PUSH AX\n";
+    return code;
+}
 #endif

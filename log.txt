@@ -1,619 +1,191 @@
 Line 1: type_specifier	: INT
 int
-Line 1: declaration_list : ID
-c
-Line 1: var_declaration : type_specifier declaration_list SEMICOLON
-int c ;
-Line 1: unit : var_declaration
-int c ;
-Line 1: program : unit
-int c ;
-Line 2: type_specifier	: INT
+Line 1: type_specifier	: INT
 int
-Line 4: type_specifier	: INT
-int
-Line 4: declaration_list : ID LTHIRD CONST_INT RTHIRD
-a [ 5 ]
-Line 4: var_declaration : type_specifier declaration_list SEMICOLON
-int a [ 5 ] ;
-Line 4: simple_statement : var_declaration
-int a [ 5 ] ;
+Line 1: parameter_list  : type_specifier ID
+int n
+Line 3: variable : ID
+n
+Line 3: factor : variable
+n
+Line 3: unary_expression : factor
+n
+Line 3: term : unary_expression
+n
+Line 3: simple_expression : term
+n
+Line 3: factor : CONST_INT
+0
+Line 3: unary_expression : factor
+0
+Line 3: term : unary_expression
+0
+Line 3: simple_expression : term
+0
+Line 3: rel_expression : simple_expression RELOP simple_expression
+n == 0
+Line 3: logic_expression : rel_expression
+n == 0
+Line 3: expression : logic_expression
+n == 0
+Line 3: factor : CONST_INT
+1
+Line 3: unary_expression : factor
+1
+Line 3: term : unary_expression
+1
+Line 3: simple_expression : term
+1
+Line 3: rel_expression : simple_expression
+1
+Line 3: logic_expression : rel_expression
+1
+Line 3: expression : logic_expression
+1
+Line 3: simple_statement : RETURN expression SEMICOLON
+return 1 ;
+Line 4: simple_statement : IF LPAREN expression RPAREN simple_statement
+if ( n == 0 ) return 1 ;
 Line 4: statement: simple_statement
-int a [ 5 ] ;
+if ( n == 0 ) return 1 ;
 Line 4: statements : statement
-int a [ 5 ] ;
-Line 5: factor : CONST_INT
-0
-Line 5: unary_expression : factor
-0
-Line 5: term : unary_expression
-0
-Line 5: simple_expression : term
-0
-Line 5: rel_expression : simple_expression
-0
-Line 5: logic_expression : rel_expression
-0
-Line 5: expression : logic_expression
-0
-Line 5: variable : ID LTHIRD expression RTHIRD
-a [ 0 ]
-Line 5: factor : CONST_INT
-3
-Line 5: unary_expression : factor
-3
-Line 5: term : unary_expression
-3
-Line 5: simple_expression : term
-3
-Line 5: rel_expression : simple_expression
-3
-Line 5: logic_expression : rel_expression
-3
-Line 5: expression : variable ASSIGNOP logic_expression
-a [ 0 ] = 3
-Line 5: expression_statement : expression SEMICOLON 
-a [ 0 ] = 3 ;
-Line 5: simple_statement : expression_statement
-a [ 0 ] = 3 ;
-Line 5: statement: simple_statement
-a [ 0 ] = 3 ;
-Line 5: statements : statements statement
-int a [ 5 ] ; a [ 0 ] = 3 ;
-Line 6: factor : CONST_INT
+if ( n == 0 ) return 1 ;
+Line 4: variable : ID
+n
+Line 4: factor : variable
+n
+Line 4: unary_expression : factor
+n
+Line 4: term : unary_expression
+n
+Line 4: variable : ID
+n
+Line 4: factor : variable
+n
+Line 4: unary_expression : factor
+n
+Line 4: term : unary_expression
+n
+Line 4: simple_expression : term
+n
+Line 4: factor : CONST_INT
 1
-Line 6: unary_expression : factor
+Line 4: unary_expression : factor
 1
-Line 6: term : unary_expression
+Line 4: term : unary_expression
 1
-Line 6: simple_expression : term
-1
-Line 6: rel_expression : simple_expression
-1
-Line 6: logic_expression : rel_expression
-1
-Line 6: expression : logic_expression
-1
-Line 6: variable : ID LTHIRD expression RTHIRD
-a [ 1 ]
-Line 6: factor : CONST_INT
-2
-Line 6: unary_expression : factor
-2
-Line 6: term : unary_expression
-2
-Line 6: simple_expression : term
-2
-Line 6: rel_expression : simple_expression
-2
-Line 6: logic_expression : rel_expression
-2
-Line 6: expression : variable ASSIGNOP logic_expression
-a [ 1 ] = 2
-Line 6: expression_statement : expression SEMICOLON 
-a [ 1 ] = 2 ;
-Line 6: simple_statement : expression_statement
-a [ 1 ] = 2 ;
-Line 6: statement: simple_statement
-a [ 1 ] = 2 ;
-Line 6: statements : statements statement
-int a [ 5 ] ; a [ 0 ] = 3 ; a [ 1 ] = 2 ;
-Line 7: factor : CONST_INT
-2
-Line 7: unary_expression : factor
-2
-Line 7: term : unary_expression
-2
-Line 7: simple_expression : term
-2
-Line 7: rel_expression : simple_expression
-2
-Line 7: logic_expression : rel_expression
-2
-Line 7: expression : logic_expression
-2
-Line 7: variable : ID LTHIRD expression RTHIRD
-a [ 2 ]
-Line 7: factor : CONST_INT
-4
-Line 7: unary_expression : factor
-4
-Line 7: term : unary_expression
-4
-Line 7: simple_expression : term
-4
-Line 7: rel_expression : simple_expression
-4
-Line 7: logic_expression : rel_expression
-4
-Line 7: expression : variable ASSIGNOP logic_expression
-a [ 2 ] = 4
-Line 7: expression_statement : expression SEMICOLON 
-a [ 2 ] = 4 ;
-Line 7: simple_statement : expression_statement
-a [ 2 ] = 4 ;
-Line 7: statement: simple_statement
-a [ 2 ] = 4 ;
-Line 7: statements : statements statement
-int a [ 5 ] ; a [ 0 ] = 3 ; a [ 1 ] = 2 ; a [ 2 ] = 4 ;
-Line 8: factor : CONST_INT
-3
-Line 8: unary_expression : factor
-3
-Line 8: term : unary_expression
-3
-Line 8: simple_expression : term
-3
-Line 8: rel_expression : simple_expression
-3
-Line 8: logic_expression : rel_expression
-3
-Line 8: expression : logic_expression
-3
-Line 8: variable : ID LTHIRD expression RTHIRD
-a [ 3 ]
-Line 8: factor : CONST_INT
-1
-Line 8: unary_expression : factor
-1
-Line 8: term : unary_expression
-1
-Line 8: simple_expression : term
-1
-Line 8: rel_expression : simple_expression
-1
-Line 8: logic_expression : rel_expression
-1
-Line 8: expression : variable ASSIGNOP logic_expression
-a [ 3 ] = 1
-Line 8: expression_statement : expression SEMICOLON 
-a [ 3 ] = 1 ;
-Line 8: simple_statement : expression_statement
-a [ 3 ] = 1 ;
-Line 8: statement: simple_statement
-a [ 3 ] = 1 ;
-Line 8: statements : statements statement
-int a [ 5 ] ; a [ 0 ] = 3 ; a [ 1 ] = 2 ; a [ 2 ] = 4 ; a [ 3 ] = 1 ;
-Line 9: factor : CONST_INT
-4
-Line 9: unary_expression : factor
-4
-Line 9: term : unary_expression
-4
-Line 9: simple_expression : term
-4
-Line 9: rel_expression : simple_expression
-4
-Line 9: logic_expression : rel_expression
-4
-Line 9: expression : logic_expression
-4
-Line 9: variable : ID LTHIRD expression RTHIRD
-a [ 4 ]
-Line 9: factor : CONST_INT
-2
-Line 9: unary_expression : factor
-2
-Line 9: term : unary_expression
-2
-Line 9: simple_expression : term
-2
-Line 9: rel_expression : simple_expression
-2
-Line 9: logic_expression : rel_expression
-2
-Line 9: expression : variable ASSIGNOP logic_expression
-a [ 4 ] = 2
-Line 9: expression_statement : expression SEMICOLON 
-a [ 4 ] = 2 ;
-Line 9: simple_statement : expression_statement
-a [ 4 ] = 2 ;
-Line 9: statement: simple_statement
-a [ 4 ] = 2 ;
-Line 9: statements : statements statement
-int a [ 5 ] ; a [ 0 ] = 3 ; a [ 1 ] = 2 ; a [ 2 ] = 4 ; a [ 3 ] = 1 ; a [ 4 ] = 2 ;
-Line 10: type_specifier	: INT
+Line 4: simple_expression : simple_expression ADDOP term
+n - 1
+Line 4: rel_expression : simple_expression
+n - 1
+Line 4: logic_expression : rel_expression
+n - 1
+Line 4: arguments : logic_expression
+n - 1
+Line 4: argument_list : arguments
+n - 1
+Line 4: factor : ID LPAREN argument_list RPAREN
+fact ( n - 1 )
+Line 4: unary_expression : factor
+fact ( n - 1 )
+Line 4: term : term MULOP unary_expression
+n * fact ( n - 1 )
+Line 4: simple_expression : term
+n * fact ( n - 1 )
+Line 4: rel_expression : simple_expression
+n * fact ( n - 1 )
+Line 4: logic_expression : rel_expression
+n * fact ( n - 1 )
+Line 4: expression : logic_expression
+n * fact ( n - 1 )
+Line 4: simple_statement : RETURN expression SEMICOLON
+return n * fact ( n - 1 ) ;
+Line 4: statement: simple_statement
+return n * fact ( n - 1 ) ;
+Line 4: statements : statements statement
+if ( n == 0 ) return 1 ; return n * fact ( n - 1 ) ;
+Line 5: compound_statement : LCURL statements RCURL
+{ if ( n == 0 ) return 1 ; return n * fact ( n - 1 ) ; }
+ScopeTable# 11
+0 --> <n: VAR> 
+ScopeTable# 1
+2 --> <fact: FUNC_DEF> 
+Line 5: func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement
+int fact ( int n ) { if ( n == 0 ) return 1 ; return n * fact ( n - 1 ) ; }
+Line 5: unit : func_definition
+int fact ( int n ) { if ( n == 0 ) return 1 ; return n * fact ( n - 1 ) ; }
+Line 5: program : unit
+int fact ( int n ) { if ( n == 0 ) return 1 ; return n * fact ( n - 1 ) ; }
+Line 6: type_specifier	: INT
 int
-Line 10: declaration_list : ID
-i
-Line 10: declaration_list : declaration_list COMMA ID
-i , j
-Line 10: declaration_list : declaration_list COMMA ID
-i , j , k
-Line 10: var_declaration : type_specifier declaration_list SEMICOLON
-int i , j , k ;
-Line 10: simple_statement : var_declaration
-int i , j , k ;
-Line 10: statement: simple_statement
-int i , j , k ;
-Line 10: statements : statements statement
-int a [ 5 ] ; a [ 0 ] = 3 ; a [ 1 ] = 2 ; a [ 2 ] = 4 ; a [ 3 ] = 1 ; a [ 4 ] = 2 ; int i , j , k ;
-Line 11: variable : ID
-i
-Line 11: factor : CONST_INT
-1
-Line 11: unary_expression : factor
-1
-Line 11: term : unary_expression
-1
-Line 11: simple_expression : term
-1
-Line 11: rel_expression : simple_expression
-1
-Line 11: logic_expression : rel_expression
-1
-Line 11: expression : variable ASSIGNOP logic_expression
-i = 1
-Line 11: expression_statement : expression SEMICOLON 
-i = 1 ;
-Line 11: variable : ID
-i
-Line 11: factor : variable
-i
-Line 11: unary_expression : factor
-i
-Line 11: term : unary_expression
-i
-Line 11: simple_expression : term
-i
-Line 11: factor : CONST_INT
+Line 8: type_specifier	: INT
+int
+Line 8: declaration_list : ID
+a
+Line 8: var_declaration : type_specifier declaration_list SEMICOLON
+int a ;
+Line 8: simple_statement : var_declaration
+int a ;
+Line 8: statement: simple_statement
+int a ;
+Line 8: statements : statement
+int a ;
+Line 9: variable : ID
+a
+Line 9: factor : CONST_INT
 5
-Line 11: unary_expression : factor
+Line 9: unary_expression : factor
 5
-Line 11: term : unary_expression
+Line 9: term : unary_expression
 5
-Line 11: simple_expression : term
+Line 9: simple_expression : term
 5
-Line 11: rel_expression : simple_expression RELOP simple_expression
-i < 5
-Line 11: logic_expression : rel_expression
-i < 5
-Line 11: expression : logic_expression
-i < 5
-Line 11: expression_statement : expression SEMICOLON 
-i < 5 ;
-Line 11: variable : ID
-i
-Line 11: factor : variable INCOP
-i ++
-Line 11: unary_expression : factor
-i ++
-Line 11: term : unary_expression
-i ++
-Line 11: simple_expression : term
-i ++
-Line 11: rel_expression : simple_expression
-i ++
-Line 11: logic_expression : rel_expression
-i ++
-Line 11: expression : logic_expression
-i ++
-Line 11: variable : ID
-j
-Line 11: variable : ID
-i
-Line 11: factor : variable
-i
-Line 11: unary_expression : factor
-i
-Line 11: term : unary_expression
-i
-Line 11: simple_expression : term
-i
-Line 11: rel_expression : simple_expression
-i
-Line 11: logic_expression : rel_expression
-i
-Line 11: expression : variable ASSIGNOP logic_expression
-j = i
-Line 11: expression_statement : expression SEMICOLON 
-j = i ;
-Line 11: variable : ID
-j
-Line 11: factor : variable
-j
-Line 11: unary_expression : factor
-j
-Line 11: term : unary_expression
-j
-Line 11: simple_expression : term
-j
-Line 11: factor : CONST_INT
-0
-Line 11: unary_expression : factor
-0
-Line 11: term : unary_expression
-0
-Line 11: simple_expression : term
-0
-Line 11: rel_expression : simple_expression RELOP simple_expression
-j > 0
-Line 11: logic_expression : rel_expression
-j > 0
-Line 11: expression : logic_expression
-j > 0
-Line 11: expression_statement : expression SEMICOLON 
-j > 0 ;
-Line 11: variable : ID
-j
-Line 11: factor : variable DECOP
-j --
-Line 11: unary_expression : factor
-j --
-Line 11: term : unary_expression
-j --
-Line 11: simple_expression : term
-j --
-Line 11: rel_expression : simple_expression
-j --
-Line 11: logic_expression : rel_expression
-j --
-Line 11: expression : logic_expression
-j --
-Line 11: variable : ID
-j
-Line 11: factor : variable
-j
-Line 11: unary_expression : factor
-j
-Line 11: term : unary_expression
-j
-Line 11: simple_expression : term
-j
-Line 11: rel_expression : simple_expression
-j
-Line 11: logic_expression : rel_expression
-j
-Line 11: expression : logic_expression
-j
-Line 11: variable : ID LTHIRD expression RTHIRD
-a [ j ]
-Line 11: factor : variable
-a [ j ]
-Line 11: unary_expression : factor
-a [ j ]
-Line 11: term : unary_expression
-a [ j ]
-Line 11: simple_expression : term
-a [ j ]
-Line 11: variable : ID
-j
-Line 11: factor : variable
-j
-Line 11: unary_expression : factor
-j
-Line 11: term : unary_expression
-j
-Line 11: simple_expression : term
-j
-Line 11: factor : CONST_INT
-1
-Line 11: unary_expression : factor
-1
-Line 11: term : unary_expression
-1
-Line 11: simple_expression : simple_expression ADDOP term
-j - 1
-Line 11: rel_expression : simple_expression
-j - 1
-Line 11: logic_expression : rel_expression
-j - 1
-Line 11: expression : logic_expression
-j - 1
-Line 11: variable : ID LTHIRD expression RTHIRD
-a [ j - 1 ]
-Line 11: factor : variable
-a [ j - 1 ]
-Line 11: unary_expression : factor
-a [ j - 1 ]
-Line 11: term : unary_expression
-a [ j - 1 ]
-Line 11: simple_expression : term
-a [ j - 1 ]
-Line 11: rel_expression : simple_expression RELOP simple_expression
-a [ j ] < a [ j - 1 ]
-Line 11: logic_expression : rel_expression
-a [ j ] < a [ j - 1 ]
-Line 11: expression : logic_expression
-a [ j ] < a [ j - 1 ]
-Line 13: variable : ID
-k
-Line 13: variable : ID
-j
-Line 13: factor : variable
-j
-Line 13: unary_expression : factor
-j
-Line 13: term : unary_expression
-j
-Line 13: simple_expression : term
-j
-Line 13: factor : CONST_INT
-1
-Line 13: unary_expression : factor
-1
-Line 13: term : unary_expression
-1
-Line 13: simple_expression : simple_expression ADDOP term
-j - 1
-Line 13: rel_expression : simple_expression
-j - 1
-Line 13: logic_expression : rel_expression
-j - 1
-Line 13: expression : logic_expression
-j - 1
-Line 13: variable : ID LTHIRD expression RTHIRD
-a [ j - 1 ]
-Line 13: factor : variable
-a [ j - 1 ]
-Line 13: unary_expression : factor
-a [ j - 1 ]
-Line 13: term : unary_expression
-a [ j - 1 ]
-Line 13: simple_expression : term
-a [ j - 1 ]
-Line 13: rel_expression : simple_expression
-a [ j - 1 ]
-Line 13: logic_expression : rel_expression
-a [ j - 1 ]
-Line 13: expression : variable ASSIGNOP logic_expression
-k = a [ j - 1 ]
-Line 13: expression_statement : expression SEMICOLON 
-k = a [ j - 1 ] ;
-Line 13: simple_statement : expression_statement
-k = a [ j - 1 ] ;
-Line 13: statement: simple_statement
-k = a [ j - 1 ] ;
-Line 13: statements : statement
-k = a [ j - 1 ] ;
-Line 14: variable : ID
-j
-Line 14: factor : variable
-j
-Line 14: unary_expression : factor
-j
-Line 14: term : unary_expression
-j
-Line 14: simple_expression : term
-j
-Line 14: factor : CONST_INT
-1
-Line 14: unary_expression : factor
-1
-Line 14: term : unary_expression
-1
-Line 14: simple_expression : simple_expression ADDOP term
-j - 1
-Line 14: rel_expression : simple_expression
-j - 1
-Line 14: logic_expression : rel_expression
-j - 1
-Line 14: expression : logic_expression
-j - 1
-Line 14: variable : ID LTHIRD expression RTHIRD
-a [ j - 1 ]
-Line 14: variable : ID
-j
-Line 14: factor : variable
-j
-Line 14: unary_expression : factor
-j
-Line 14: term : unary_expression
-j
-Line 14: simple_expression : term
-j
-Line 14: rel_expression : simple_expression
-j
-Line 14: logic_expression : rel_expression
-j
-Line 14: expression : logic_expression
-j
-Line 14: variable : ID LTHIRD expression RTHIRD
-a [ j ]
-Line 14: factor : variable
-a [ j ]
-Line 14: unary_expression : factor
-a [ j ]
-Line 14: term : unary_expression
-a [ j ]
-Line 14: simple_expression : term
-a [ j ]
-Line 14: rel_expression : simple_expression
-a [ j ]
-Line 14: logic_expression : rel_expression
-a [ j ]
-Line 14: expression : variable ASSIGNOP logic_expression
-a [ j - 1 ] = a [ j ]
-Line 14: expression_statement : expression SEMICOLON 
-a [ j - 1 ] = a [ j ] ;
-Line 14: simple_statement : expression_statement
-a [ j - 1 ] = a [ j ] ;
-Line 14: statement: simple_statement
-a [ j - 1 ] = a [ j ] ;
-Line 14: statements : statements statement
-k = a [ j - 1 ] ; a [ j - 1 ] = a [ j ] ;
-Line 15: variable : ID
-j
-Line 15: factor : variable
-j
-Line 15: unary_expression : factor
-j
-Line 15: term : unary_expression
-j
-Line 15: simple_expression : term
-j
-Line 15: rel_expression : simple_expression
-j
-Line 15: logic_expression : rel_expression
-j
-Line 15: expression : logic_expression
-j
-Line 15: variable : ID LTHIRD expression RTHIRD
-a [ j ]
-Line 15: variable : ID
-k
-Line 15: factor : variable
-k
-Line 15: unary_expression : factor
-k
-Line 15: term : unary_expression
-k
-Line 15: simple_expression : term
-k
-Line 15: rel_expression : simple_expression
-k
-Line 15: logic_expression : rel_expression
-k
-Line 15: expression : variable ASSIGNOP logic_expression
-a [ j ] = k
-Line 15: expression_statement : expression SEMICOLON 
-a [ j ] = k ;
-Line 15: simple_statement : expression_statement
-a [ j ] = k ;
-Line 15: statement: simple_statement
-a [ j ] = k ;
-Line 15: statements : statements statement
-k = a [ j - 1 ] ; a [ j - 1 ] = a [ j ] ; a [ j ] = k ;
-Line 16: compound_statement : LCURL statements RCURL
-{ k = a [ j - 1 ] ; a [ j - 1 ] = a [ j ] ; a [ j ] = k ; }
-ScopeTable# 111
-ScopeTable# 11
-5 --> <i: VAR> 
-6 --> <j: VAR> 
-7 --> <k: VAR> <a: VAR_ARRAY> 
+Line 9: rel_expression : simple_expression
+5
+Line 9: logic_expression : rel_expression
+5
+Line 9: arguments : logic_expression
+5
+Line 9: argument_list : arguments
+5
+Line 9: factor : ID LPAREN argument_list RPAREN
+fact ( 5 )
+Line 9: unary_expression : factor
+fact ( 5 )
+Line 9: term : unary_expression
+fact ( 5 )
+Line 9: simple_expression : term
+fact ( 5 )
+Line 9: rel_expression : simple_expression
+fact ( 5 )
+Line 9: logic_expression : rel_expression
+fact ( 5 )
+Line 9: expression : variable ASSIGNOP logic_expression
+a = fact ( 5 )
+Line 9: expression_statement : expression SEMICOLON 
+a = fact ( 5 ) ;
+Line 9: simple_statement : expression_statement
+a = fact ( 5 ) ;
+Line 9: statement: simple_statement
+a = fact ( 5 ) ;
+Line 9: statements : statements statement
+int a ; a = fact ( 5 ) ;
+Line 10: compound_statement : LCURL statements RCURL
+{ int a ; a = fact ( 5 ) ; }
+ScopeTable# 12
+7 --> <a: VAR> 
 ScopeTable# 1
+2 --> <fact: FUNC_DEF> 
 3 --> <main: FUNC_DEF> 
-9 --> <c: VAR> 
-Line 16: simple_statement : compound_statement
-{ k = a [ j - 1 ] ; a [ j - 1 ] = a [ j ] ; a [ j ] = k ; }
-Line 16: simple_statement : IF LPAREN expression RPAREN simple_statement
-if ( a [ j ] < a [ j - 1 ] ) { k = a [ j - 1 ] ; a [ j - 1 ] = a [ j ] ; a [ j ] = k ; }
-Line 16: simple_statement : FOR LPAREN expression_statement expression_statement expression RPAREN simple_statement
-
-Line 16: simple_statement : FOR LPAREN expression_statement expression_statement expression RPAREN simple_statement
-
-Line 16: statement: simple_statement
-
-Line 16: statements : statements statement
-int a [ 5 ] ; a [ 0 ] = 3 ; a [ 1 ] = 2 ; a [ 2 ] = 4 ; a [ 3 ] = 1 ; a [ 4 ] = 2 ; int i , j , k ; 
-Line 17: compound_statement : LCURL statements RCURL
-{ int a [ 5 ] ; a [ 0 ] = 3 ; a [ 1 ] = 2 ; a [ 2 ] = 4 ; a [ 3 ] = 1 ; a [ 4 ] = 2 ; int i , j , k ;  }
-ScopeTable# 11
-5 --> <i: VAR> 
-6 --> <j: VAR> 
-7 --> <k: VAR> <a: VAR_ARRAY> 
+Line 10: func_definition : type_specifier ID LPAREN RPAREN compound_statement
+int main ( ) { int a ; a = fact ( 5 ) ; }
+Line 10: unit : func_definition
+int main ( ) { int a ; a = fact ( 5 ) ; }
+Line 10: program : program unit
+int fact ( int n ) { if ( n == 0 ) return 1 ; return n * fact ( n - 1 ) ; } int main ( ) { int a ; a = fact ( 5 ) ; }
+Line 10: start : program
+int fact ( int n ) { if ( n == 0 ) return 1 ; return n * fact ( n - 1 ) ; } int main ( ) { int a ; a = fact ( 5 ) ; }
 ScopeTable# 1
+2 --> <fact: FUNC_DEF> 
 3 --> <main: FUNC_DEF> 
-9 --> <c: VAR> 
-Line 17: func_definition : type_specifier ID LPAREN RPAREN compound_statement
-int main ( ) { int a [ 5 ] ; a [ 0 ] = 3 ; a [ 1 ] = 2 ; a [ 2 ] = 4 ; a [ 3 ] = 1 ; a [ 4 ] = 2 ; int i , j , k ;  }
-Line 17: unit : func_definition
-int main ( ) { int a [ 5 ] ; a [ 0 ] = 3 ; a [ 1 ] = 2 ; a [ 2 ] = 4 ; a [ 3 ] = 1 ; a [ 4 ] = 2 ; int i , j , k ;  }
-Line 17: program : program unit
-int c ; int main ( ) { int a [ 5 ] ; a [ 0 ] = 3 ; a [ 1 ] = 2 ; a [ 2 ] = 4 ; a [ 3 ] = 1 ; a [ 4 ] = 2 ; int i , j , k ;  }
-Line 17: start : program
-int c ; int main ( ) { int a [ 5 ] ; a [ 0 ] = 3 ; a [ 1 ] = 2 ; a [ 2 ] = 4 ; a [ 3 ] = 1 ; a [ 4 ] = 2 ; int i , j , k ;  }
-ScopeTable# 1
-3 --> <main: FUNC_DEF> 
-9 --> <c: VAR> 
-Total Line: 17
+Total Line: 10
