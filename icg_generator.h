@@ -146,7 +146,8 @@ string unary_logicop(string op)
     { 
         string true_label=new_label();
         string exit_label=new_label();
-        code+="POP AX\nCMP AX, 0\nJE "+true_label+"\nPUSH 0\nJMP "+exit_label+"\n"+true_label+":\n"+"PUSH 1\n"+exit_label+":\n\n";
+        string false_label=new_label();
+        code+="POP AX\nCMP AX, 0\nJNE "+false_label+"\nJMP "+true_label+"\n"+false_label+":\nPUSH 0\nJMP "+exit_label+"\n"+true_label+":\n"+"PUSH 1\n"+exit_label+":\n\n";
     
     }
     return code;
@@ -157,32 +158,38 @@ string relop(string op)
     if(op=="=="){
         string true_label=new_label();
         string exit_label=new_label();
-        code+="POP BX\nPOP AX\nCMP AX, BX\nJE "+true_label+"\nPUSH 0\nJMP "+exit_label+"\n"+true_label+":\n"+"PUSH 1\n"+exit_label+":\n\n";
+        string false_label=new_label();
+        code+="POP BX\nPOP AX\nCMP AX, BX\nJNE "+false_label+"\nJMP "+true_label+"\n"+false_label+":\nPUSH 0\nJMP "+exit_label+"\n"+true_label+":\n"+"PUSH 1\n"+exit_label+":\n\n";
     }
     if(op=="!="){
         string true_label=new_label();
         string exit_label=new_label();
-        code+="POP BX\nPOP AX\nCMP AX, BX\nJNE "+true_label+"\nPUSH 0\nJMP "+exit_label+"\n"+true_label+":\n"+"PUSH 1\n"+exit_label+":\n\n";
+        string false_label=new_label();
+        code+="POP BX\nPOP AX\nCMP AX, BX\nJE "+false_label+"\nJMP "+true_label+"\n"+false_label+":\nPUSH 0\nJMP "+exit_label+"\n"+true_label+":\n"+"PUSH 1\n"+exit_label+":\n\n";
     }
     if(op=="<"){
         string true_label=new_label();
         string exit_label=new_label();
-        code+="POP BX\nPOP AX\nCMP AX, BX\nJL "+true_label+"\nPUSH 0\nJMP "+exit_label+"\n"+true_label+":\n"+"PUSH 1\n"+exit_label+":\n\n";
+        string false_label=new_label();
+        code+="POP BX\nPOP AX\nCMP AX, BX\nJGE "+false_label+"\nJMP "+true_label+"\n"+false_label+":\nPUSH 0\nJMP "+exit_label+"\n"+true_label+":\n"+"PUSH 1\n"+exit_label+":\n\n";
     }
     if(op==">"){
         string true_label=new_label();
         string exit_label=new_label();
-        code+="POP BX\nPOP AX\nCMP AX, BX\nJG "+true_label+"\nPUSH 0\nJMP "+exit_label+"\n"+true_label+":\n"+"PUSH 1\n"+exit_label+":\n\n";
+        string false_label=new_label();
+        code+="POP BX\nPOP AX\nCMP AX, BX\nJLE "+false_label+"\nJMP "+true_label+"\n"+false_label+":\nPUSH 0\nJMP "+exit_label+"\n"+true_label+":\n"+"PUSH 1\n"+exit_label+":\n\n";
     }
     if(op=="<="){
         string true_label=new_label();
         string exit_label=new_label();
-        code+="POP BX\nPOP AX\nCMP AX, BX\nJLE "+true_label+"\nPUSH 0\nJMP "+exit_label+"\n"+true_label+":\n"+"PUSH 1\n"+exit_label+":\n\n";
+        string false_label=new_label();
+        code+="POP BX\nPOP AX\nCMP AX, BX\nJG "+false_label+"\nJMP "+true_label+"\n"+false_label+":\nPUSH 0\nJMP "+exit_label+"\n"+true_label+":\n"+"PUSH 1\n"+exit_label+":\n\n";
     }
     if(op==">="){
         string true_label=new_label();
         string exit_label=new_label();
-        code+="POP BX\nPOP AX\nCMP AX, BX\nJGE "+true_label+"\nPUSH 0\nJMP "+exit_label+"\n"+true_label+":\n"+"PUSH 1\n"+exit_label+":\n\n";
+        string false_label=new_label();
+        code+="POP BX\nPOP AX\nCMP AX, BX\nJL "+false_label+"\nJMP "+true_label+"\n"+false_label+":\nPUSH 0\nJMP "+exit_label+"\n"+true_label+":\n"+"PUSH 1\n"+exit_label+":\n\n";
     }
     return code;
 }
@@ -203,7 +210,8 @@ string assignop(string var, string type)
 }
 string jump_if_false(string label)
 {
-    string code="POP AX\nCMP AX, 0\nJE "+label+"\n\n";
+    string false_label=new_label();
+    string code="POP AX\nCMP AX, 0\nJNE "+false_label+"\nJMP "+label+"\n"+false_label+":\n\n";
     return code;
 }
 string jump(string label)
