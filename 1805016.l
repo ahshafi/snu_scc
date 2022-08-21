@@ -97,7 +97,8 @@ float {digit}*(\.{digit}+)?(E[+-]?{digit}+)?
 
 <INITIAL>[+-] { set_yylval(yytext, "ADDOP"); return ADDOP; }
 <INITIAL>[*/%] {  set_yylval(yytext, "MULOP"); return MULOP;}
-<INITIAL>("++"|"--") {  set_yylval(yytext, "INCOP"); return INCOP;}
+<INITIAL>("++") {  set_yylval(yytext, "INCOP"); return INCOP;}
+<INITIAL>("--") {  set_yylval(yytext, "INCOP"); return DECOP;}
 <INITIAL>("<"|"<="|">"|">="|"=="|"!=") {  set_yylval(yytext, "RELOP"); return RELOP;}
 <INITIAL>"=" { set_yylval(yytext, "ASSIGNOP"); return ASSIGNOP; }
 <INITIAL>("&&"|"||") {  set_yylval(yytext, "LOGICOP"); return LOGICOP;}

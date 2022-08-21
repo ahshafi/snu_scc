@@ -59,6 +59,36 @@ string push_literal(string val)
     string code="PUSH "+val+"\n\n";
     return code;
 }
+string incop(string var, string type)
+{
+    if(type=="VAR_ARRAY"){
+        while(true){
+            if(var.back()=='[') { var.pop_back(), var.pop_back(); break; }
+            var.pop_back();
+        }
+    }
+    string asm_name=st.lookup(var)->lookup(var)->asm_name;
+    string code;
+    if(type=="VAR") code+="PUSH "+asm_name+"\nINC "+asm_name+"\n\n";
+    else if(type=="VAR_ARRAY") 
+        code+="LEA SI, "+asm_name+"\nPOP AX\nADD AX, AX\nADD SI, AX\nPUSH [SI]\nADD WORD PTR [SI], 1\n\n";
+    return code;
+}
+string decop(string var, string type)
+{
+    if(type=="VAR_ARRAY"){
+        while(true){
+            if(var.back()=='[') { var.pop_back(), var.pop_back(); break; }
+            var.pop_back();
+        }
+    }
+    string asm_name=st.lookup(var)->lookup(var)->asm_name;
+    string code;
+    if(type=="VAR") code+="PUSH "+asm_name+"\nDEC "+asm_name+"\n\n";
+    else if(type=="VAR_ARRAY") 
+        code+="LEA SI, "+asm_name+"\nPOP AX\nADD AX, AX\nADD SI, AX\nPUSH [SI]\nSUB WORD PTR [SI], 1\n\n";
+    return code;
+}
 string unary_pop()
 {
     string code="POP AX\n\n";

@@ -38,7 +38,7 @@ ostream& operator<<(ostream &os, vector<T> &vec)
 	return os;
 }
 
-stack<string> iflabel;
+stack<string> iflabel, whilelabel, forlabel;
 %}
 
 %union 
@@ -46,7 +46,7 @@ stack<string> iflabel;
 	SymbolInfo *symbolInfo;
 }
 %token <symbolInfo> IF ELSE FOR WHILE INT FLOAT RETURN VOID PRINTLN ADDOP MULOP ASSIGNOP RELOP LOGICOP NOT SEMICOLON COMMA LPAREN RPAREN LCURL RCURL LTHIRD RTHIRD INCOP DECOP CONST_INT CONST_FLOAT ID STRING CONST_CHAR
-%type <symbolInfo> start program unit var_declaration func_declaration func_definition type_specifier parameter_list declaration_list statements statement simple_statement expression_statement compound_statement expression variable logic_expression rel_expression simple_expression term unary_expression factor argument_list arguments
+%type <symbolInfo> start program unit var_declaration func_declaration func_definition type_specifier parameter_list declaration_list statements statement simple_statement expression_statement conditional_expression_statement  compound_statement expression conditional_expression variable logic_expression rel_expression simple_expression term unary_expression factor argument_list arguments
 
 
 
@@ -347,11 +347,37 @@ simple_statement : var_declaration
 		$$->name=$1->name;
 		rule_matched("simple_statement : compound_statement", $$->name);
 	  }
-	  | FOR LPAREN expression_statement expression_statement expression RPAREN simple_statement
+	  | FOR 
+	  {
+		code_seg+=";start for loop\n";
+	  }
+	  LPAREN expression_statement 
+	  {
+		string loop_label=new_label();
+		forlabel.push(loop_label);
+		code_seg+=loop_label+":\n";
+	  }
+	  conditional_expression_statement expression 
+	  {
+		string tail_label=forlabel.top(); forlabel.pop();
+		string body_label=forlabel.top(); forlabel.pop();
+		string exit_label=forlabel.top(); forlabel.pop();
+		string loop_label=forlabel.top(); forlabel.pop();
+		code_seg+=jump(loop_label);
+		code_seg+=body_label+":\n";
+		forlabel.push(exit_label), forlabel.push(tail_label);
+	  }
+	  RPAREN simple_statement
 	  {
 	  	$$=new SymbolInfo();
-		$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$5->name+" "+$6->name+" "+$7->name;
+		//$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$5->name+" "+$6->name+" "+$7->name;
 	  	rule_matched("simple_statement : FOR LPAREN expression_statement expression_statement expression RPAREN simple_statement", $$->name);
+	  
+	  	string tail_label=forlabel.top(); forlabel.pop();
+		code_seg+=jump(tail_label);
+		string exit_label=forlabel.top(); forlabel.pop();
+		code_seg+=exit_label+":\n\n";
+		code_seg+=";end for loop\n";
 	  }
 	  | IF LPAREN conditional_expression RPAREN simple_statement
 	  {
@@ -362,14 +388,29 @@ simple_statement : var_declaration
 		code_seg+=exit_label+":\n\n";
 
 	  	$$=new SymbolInfo();
-		//$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$6->name;
+		$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$5->name;
 	  	rule_matched("simple_statement : IF LPAREN expression RPAREN simple_statement", $$->name);
 	  }
-	  | WHILE LPAREN expression RPAREN simple_statement
+	  | WHILE 
+	  {
+		whilelabel.push(new_label());
+		code_seg+=whilelabel.top()+":\n";
+	  }
+	  LPAREN expression 
+	  {
+		whilelabel.push(new_label());
+		code_seg+=jump_if_false(whilelabel.top());
+	  }
+	  RPAREN simple_statement
 	  {
 	  	$$=new SymbolInfo();
-		$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$5->name;
+		//$$->name=$1->name+" "+$3->name+" "+$4->name+" "+$6->name+" "+$7->name;
 	  	rule_matched("simple_statement : WHILE LPAREN expression RPAREN simple_statement", $$->name);
+	  
+	  	string exit_label=whilelabel.top(); whilelabel.pop();
+		string loop_label=whilelabel.top(); whilelabel.pop();
+		code_seg+=jump(loop_label);
+		code_seg+=exit_label+":\n\n";
 	  }
 	  | PRINTLN LPAREN ID RPAREN SEMICOLON
 	  {
@@ -402,7 +443,7 @@ statement: simple_statement
 	  statement
 	  {
 	  	$$=new SymbolInfo();
-		//$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$6->name+" "+$7->name+" "+$8->name;
+		$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$5->name+" "+$6->name+" "+$8->name;
 	  	rule_matched("statement : IF LPAREN expression RPAREN simple_statement ELSE statement", $$->name);
 	  	
 		string exit_label=iflabel.top(); iflabel.pop();
@@ -417,6 +458,42 @@ conditional_expression : expression
 				iflabel.push(false_label);
 				code_seg+=jump_if_false(false_label);
 	  		}
+conditional_expression_statement : SEMICOLON	
+			{
+				$$=new SymbolInfo();
+				$$->name=$1->name;
+				rule_matched("expression_statement : SEMICOLON", $$->name);
+
+				string exit_label=new_label();
+				forlabel.push(exit_label);
+
+				string body_label=new_label();
+				forlabel.push(body_label);
+				code_seg+=jump(body_label);
+
+				string tail_label=new_label();
+				forlabel.push(tail_label);
+				code_seg+=tail_label+":\n";
+			}		
+			| expression SEMICOLON 
+			{
+				$$=new SymbolInfo();
+				$$->name=$1->name+" "+$2->name;
+	  			rule_matched("expression_statement : expression SEMICOLON ", $$->name);
+
+				string exit_label=new_label();
+				forlabel.push(exit_label);
+				code_seg+=jump_if_false(exit_label);
+
+				string body_label=new_label();
+				forlabel.push(body_label);
+				code_seg+=jump(body_label);
+
+				string tail_label=new_label();
+				forlabel.push(tail_label);
+				code_seg+=tail_label+":\n";
+			}
+			;
 expression_statement : SEMICOLON	
 			{
 				$$=new SymbolInfo();
@@ -699,6 +776,8 @@ factor	: variable
 		$$->name=$1->name+" "+$2->name;
 		$$->ret=$1->ret;
 	  	rule_matched("factor : variable INCOP", $$->name);
+
+		code_seg+=incop($1->name, $1->type);
 	}
 	| variable DECOP
 	{
@@ -706,6 +785,8 @@ factor	: variable
 		$$->name=$1->name+" "+$2->name;
 		$$->ret=$1->ret;
 	  	rule_matched("factor : variable DECOP", $$->name);
+
+		code_seg+=decop($1->name, $1->type);
 	}
 	;
 	
