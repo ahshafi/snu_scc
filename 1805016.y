@@ -3,6 +3,7 @@
 using namespace std;
 #define fastio ios::sync_with_stdio(false);cin.tie(NULL)
 fstream enlog("log.txt", std::ofstream::out | std::ofstream::trunc);
+fstream gic("code.asm", std::ofstream::out | std::ofstream::trunc);
 #include "SymbolTable.h"
 
 int yyparse(void);
@@ -15,8 +16,9 @@ SymbolTable st(10);
 bool in=false;
 fstream err("error.txt", std::ofstream::out | std::ofstream::trunc);
 int error_count=0;
-#include "semantic_processor.h"
 
+#include "semantic_processor.h"
+#include "icg_generator.h"
 void yyerror(char *s)
 {
 	error_count++;
@@ -35,6 +37,8 @@ ostream& operator<<(ostream &os, vector<T> &vec)
 	for(auto v: vec) cout<<v<<" ";
 	return os;
 }
+
+stack<string> iflabel;
 %}
 
 %union 
@@ -74,7 +78,7 @@ program : program unit
 unit : var_declaration
 	{
 		$$=new SymbolInfo();
-			$$->name=$1->name;
+		$$->name=$1->name;
 		rule_matched("unit : var_declaration", $$->name);
 	}
      | func_declaration
@@ -112,24 +116,36 @@ func_definition : type_specifier ID LPAREN parameter_list RPAREN
 		{
 			//cout<<"faker\n";
 			process_function_definition($2->name, $1->name, $4->param, $4->pids);
+			generate_declaration($4->pids);
+
+			code_seg+=$2->name+" PROC\n";
+			if($2->name=="main") code_seg+="MOV AX, @DATA\nMOV DS, AX\n";
 		}
 		compound_statement
 		{
 			$$=new SymbolInfo();
 			$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$5->name+" "+$7->name;
-			
 			rule_matched("func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement", $$->name);
+			
+			code_seg+=$2->name+" ENDP\n";
+			if($2->name=="main") code_seg+="END MAIN\n";
 		}
 		| type_specifier ID LPAREN RPAREN
 		{
 			//cout<<"faker\n";
 			process_function_definition($2->name, $1->name, vector<string>(), vector<string>());
+		
+			code_seg+=$2->name+" PROC\n";
+			if($2->name=="main") code_seg+="MOV AX, @DATA\nMOV DS, AX\n";
 		}
 		compound_statement
 		{
 			$$=new SymbolInfo();
 			$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$6->name;
 			rule_matched("func_definition : type_specifier ID LPAREN RPAREN compound_statement", $$->name);
+			
+			code_seg+=$2->name+" ENDP\n";
+			if($2->name=="main") code_seg+="END MAIN\n";
 		}
 		
  		;				
@@ -237,6 +253,7 @@ var_declaration : type_specifier declaration_list SEMICOLON
 			$$=new SymbolInfo();
 			$$->name=$1->name+" "+$2->name+" "+$3->name;
 			process_var_declaration($1->name, $2->param);
+			//generate_declaration($2->param);
 			rule_matched("var_declaration : type_specifier declaration_list SEMICOLON", $$->name);	
 		}
  		 ;
@@ -267,6 +284,8 @@ declaration_list : declaration_list COMMA ID
 			$$->name=$1->name+" "+$2->name+" "+$3->name;
 			process_declaration_list($1->param, $3->name, "VAR", $$);
 			rule_matched("declaration_list : declaration_list COMMA ID", $$->name);
+		  
+		  	generate_declaration($3->name);
 		  }
  		  | declaration_list COMMA ID LTHIRD CONST_INT RTHIRD
  		  {
@@ -274,12 +293,15 @@ declaration_list : declaration_list COMMA ID
 			$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$5->name+" "+$6->name;
 			process_declaration_list($1->param, $3->name, "VAR_ARRAY", $$);
 			rule_matched("declaration_list : declaration_list COMMA ID LTHIRD CONST_INT RTHIRD", $$->name);
- 		  }
+ 		  
+		  	generate_declaration($3->name, $5->name);
+		  }
  		  | ID
  		  {
  		  	$$=new SymbolInfo();
 			$$->name=$1->name;
 			process_declaration_list(vector<string>(), $1->name, "VAR", $$);
+			generate_declaration($1->name);
 			rule_matched("declaration_list : ID", $$->name);
  		  }
  		  | ID LTHIRD CONST_INT RTHIRD
@@ -287,6 +309,7 @@ declaration_list : declaration_list COMMA ID
  		  	$$=new SymbolInfo();
 			$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name;
 			process_declaration_list(vector<string>(), $1->name, "VAR_ARRAY", $$);
+			generate_declaration($1->name, $3->name);
 			rule_matched("declaration_list : ID LTHIRD CONST_INT RTHIRD", $$->name);
  		  }
  		  ;
@@ -330,10 +353,25 @@ simple_statement : var_declaration
 		$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$5->name+" "+$6->name+" "+$7->name;
 	  	rule_matched("simple_statement : FOR LPAREN expression_statement expression_statement expression RPAREN simple_statement", $$->name);
 	  }
-	  | IF LPAREN expression RPAREN simple_statement
+	  | IF LPAREN expression 
 	  {
+			string exit_label=new_label();
+			string false_label=new_label();
+			iflabel.push(exit_label);
+			iflabel.push(false_label);
+			code_seg+=jump_if_false(false_label);
+	  } RPAREN 
+	  
+	  simple_statement
+	  {
+		string false_label=iflabel.top(); iflabel.pop();
+		string exit_label=iflabel.top(); iflabel.pop();
+		code_seg+=jump(exit_label);
+		code_seg+=false_label+":\n";
+		code_seg+=exit_label+":\n\n";
+
 	  	$$=new SymbolInfo();
-		$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$5->name;
+		//$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$6->name;
 	  	rule_matched("simple_statement : IF LPAREN expression RPAREN simple_statement", $$->name);
 	  }
 	  | WHILE LPAREN expression RPAREN simple_statement
@@ -362,10 +400,14 @@ statement: simple_statement
 		$$->name=$1->name;
 		rule_matched("statement: simple_statement", $$->name);
 	  }
-	  | IF LPAREN expression RPAREN simple_statement ELSE statement
+	  | IF LPAREN expression 
+	  {
+
+	  } RPAREN
+	  simple_statement ELSE statement
 	  {
 	  	$$=new SymbolInfo();
-		$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$5->name+" "+$6->name+" "+$7->name;
+		//$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$6->name+" "+$7->name+" "+$8->name;
 	  	rule_matched("statement : IF LPAREN expression RPAREN simple_statement ELSE statement", $$->name);
 	  } 
  	;
@@ -378,8 +420,10 @@ expression_statement : SEMICOLON
 			| expression SEMICOLON 
 			{
 				$$=new SymbolInfo();
-			$$->name=$1->name+" "+$2->name;
+				$$->name=$1->name+" "+$2->name;
 	  			rule_matched("expression_statement : expression SEMICOLON ", $$->name);
+
+				code_seg+=unary_pop();
 			}
 			;
 
@@ -428,6 +472,8 @@ expression : logic_expression
 			else $$->ret=$1->ret;
 
 	  		rule_matched("expression : variable ASSIGNOP logic_expression", $$->name);
+		
+			code_seg+=assignop($1->name);
 		}
 	   ;
 			
@@ -455,6 +501,8 @@ logic_expression : rel_expression
 			}
 
 	  		rule_matched("logic_expression : rel_expression LOGICOP rel_expression", $$->name);
+		
+			code_seg+=binary_logicop($2->name);
 		}
 		;
 			
@@ -482,6 +530,8 @@ rel_expression	: simple_expression
 			}
 
 	  		rule_matched("rel_expression : simple_expression RELOP simple_expression", $$->name);
+		
+			code_seg+=relop($2->name);
 		}
 		;
 				
@@ -512,6 +562,8 @@ simple_expression : term
 			}
 
 	  		rule_matched("simple_expression : simple_expression ADDOP term", $$->name);
+		
+			code_seg+=binary_addop($2->name);
 		}
 		;
 					
@@ -550,6 +602,8 @@ term :	unary_expression
 				$$->ret="CONST_INT";
 			}
 	  		rule_matched("term : term MULOP unary_expression", $$->name);
+
+			code_seg+=binary_mulop($2->name);
 		}
      	;
 
@@ -563,6 +617,8 @@ unary_expression : ADDOP unary_expression
 			}
 			else $$->ret=$2->ret;
 	  		rule_matched("unary_expression : ADDOP unary_expression", $$->name);
+
+			code_seg+=unary_addop($1->name);
 		}
 		| NOT unary_expression 
 		{
@@ -574,6 +630,8 @@ unary_expression : ADDOP unary_expression
 			}
 			else $$->ret="CONST_INT";
 	  		rule_matched("unary_expression : NOT unary_expression", $$->name);
+
+			code_seg+=unary_logicop($1->name);
 		}
 		| factor 
 		{
@@ -590,6 +648,8 @@ factor	: variable
 		$$->name=$1->name;
 		$$->ret=$1->ret;
 		rule_matched("factor : variable", $$->name);
+
+		code_seg+=push_var($1->name);
 	}
 	| ID LPAREN argument_list RPAREN
 	{
@@ -612,6 +672,8 @@ factor	: variable
 		$$->name=$1->name;
 		$$->ret="CONST_INT";
 		rule_matched("factor : CONST_INT", $$->name);
+
+		code_seg+=push_literal($1->name);
 	}
 	| CONST_FLOAT
 	{
@@ -669,6 +731,16 @@ arguments : arguments COMMA logic_expression
  
 
 %%
+//asm code
+string initiation=".MODEL SMALL\n.STACK 100H\n";
+string data_seg=".DATA\n";
+string code_seg=".CODE\n";
+string icg;
+//asm code
+void init()
+{
+
+}
 int main(int argc, char* argv[])
 {
 	//fastio;
@@ -690,6 +762,9 @@ int main(int argc, char* argv[])
 	enlog<<"Total Line: "<<line_count<<"\n";
 	err<<"Total Error: "<<error_count<<"\n";
 	st.exit();
+
+	icg=initiation+data_seg+code_seg;
+	cout<<icg;
 	return 0;
 }
 

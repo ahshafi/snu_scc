@@ -22,7 +22,7 @@ public:
 		scopes.push(newScope);
 		newScope->parentScope=curScope;
 		if(curScope!=nullptr) curScope->childNum++;
-		if(curScope!=nullptr) newScope->id=curScope->id+"."+to_string(curScope->childNum);
+		if(curScope!=nullptr) newScope->id=curScope->id+to_string(curScope->childNum);
 		else newScope->id="1";
 		curScope=newScope;
 		//cout<<"New ScopeTable with id# "<<newScope->id<<" is created\n";
@@ -68,7 +68,10 @@ public:
 		if(curScope==nullptr) cout<<"NO CURRENT SCOPE\n";
 		else curScope->print();
 	}
-
+	string getScope()
+	{
+		return "GLOBAL"+curScope->getScope();
+	}
 	void printAll()
 	{
 		if(curScope==nullptr) cout<<"NO CURRENT SCOPE\n";

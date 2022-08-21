@@ -5,7 +5,7 @@ using namespace std;
 class SymbolInfo
 {
 public:
-	string name, type;
+	string name, type, asm_name;
 	SymbolInfo(){}
 	SymbolInfo(string name, string type): name(name), type(type) {}
 	SymbolInfo *next;

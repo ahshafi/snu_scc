@@ -1,0 +1,136 @@
+Line 1: type_specifier	: INT
+int
+Line 1: declaration_list : ID
+c
+Line 1: var_declaration : type_specifier declaration_list SEMICOLON
+int c ;
+Line 1: unit : var_declaration
+int c ;
+Line 1: program : unit
+int c ;
+Line 2: type_specifier	: INT
+int
+Line 4: type_specifier	: INT
+int
+Line 4: declaration_list : ID
+a
+Line 4: declaration_list : declaration_list COMMA ID
+a , b
+Line 4: declaration_list : declaration_list COMMA ID
+a , b , d
+Line 4: var_declaration : type_specifier declaration_list SEMICOLON
+int a , b , d ;
+Line 4: simple_statement : var_declaration
+int a , b , d ;
+Line 4: statement: simple_statement
+int a , b , d ;
+Line 4: statements : statement
+int a , b , d ;
+Line 5: variable : ID
+a
+Line 5: factor : CONST_INT
+2
+Line 5: unary_expression : factor
+2
+Line 5: term : unary_expression
+2
+Line 5: simple_expression : term
+2
+Line 5: rel_expression : simple_expression
+2
+Line 5: logic_expression : rel_expression
+2
+Line 5: expression : variable ASSIGNOP logic_expression
+a = 2
+Line 5: expression_statement : expression SEMICOLON 
+a = 2 ;
+Line 5: simple_statement : expression_statement
+a = 2 ;
+Line 5: statement: simple_statement
+a = 2 ;
+Line 5: statements : statements statement
+int a , b , d ; a = 2 ;
+Line 6: variable : ID
+b
+Line 6: factor : CONST_INT
+2
+Line 6: unary_expression : factor
+2
+Line 6: term : unary_expression
+2
+Line 6: simple_expression : term
+2
+Line 6: rel_expression : simple_expression
+2
+Line 6: logic_expression : rel_expression
+2
+Line 6: expression : variable ASSIGNOP logic_expression
+b = 2
+Line 6: expression_statement : expression SEMICOLON 
+b = 2 ;
+Line 6: simple_statement : expression_statement
+b = 2 ;
+Line 6: statement: simple_statement
+b = 2 ;
+Line 6: statements : statements statement
+int a , b , d ; a = 2 ; b = 2 ;
+Line 7: variable : ID
+a
+Line 7: factor : variable
+a
+Line 7: unary_expression : factor
+a
+Line 7: term : unary_expression
+a
+Line 7: simple_expression : term
+a
+Line 7: variable : ID
+b
+Line 7: factor : variable
+b
+Line 7: unary_expression : factor
+b
+Line 7: term : unary_expression
+b
+Line 7: simple_expression : term
+b
+Line 7: rel_expression : simple_expression RELOP simple_expression
+a != b
+Line 7: logic_expression : rel_expression
+a != b
+Line 7: expression : logic_expression
+a != b
+Line 7: variable : ID
+c
+Line 7: factor : CONST_INT
+3
+Line 7: unary_expression : factor
+3
+Line 7: term : unary_expression
+3
+Line 7: simple_expression : term
+3
+Line 7: rel_expression : simple_expression
+3
+Line 7: logic_expression : rel_expression
+3
+Line 7: expression : variable ASSIGNOP logic_expression
+c = 3
+Line 7: expression_statement : expression SEMICOLON 
+c = 3 ;
+Line 7: simple_statement : expression_statement
+c = 3 ;
+Line 7: simple_statement : IF LPAREN expression RPAREN simple_statement
+
+Line 7: statement: simple_statement
+
+Line 7: statements : statements statement
+int a , b , d ; a = 2 ; b = 2 ; 
+ScopeTable# 11
+0 --> <d: VAR> 
+7 --> <a: VAR> 
+8 --> <b: VAR> 
+ScopeTable# 1
+3 --> <main: FUNC_DEF> 
+9 --> <c: VAR> 
+Total Line: 8

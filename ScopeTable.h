@@ -97,7 +97,10 @@ public:
 
 		}
 	}
-
+	string getScope()
+	{
+		return this->id;
+	}
 	~ScopeTable()
 	{
 		for(int i=0;i<n;i++){
