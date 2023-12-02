@@ -121,10 +121,10 @@ string binary_mulop(string op)
     { code="POP AX\nPOP DX\nMUL DX\nPUSH AX\n\n";
     }
     if(op=="/")
-    { code="POP BX\nPOP AX\nIDIV BX\nPUSH AX\n\n";
+    { code="MOV DX, 0\nPOP BX\nPOP AX\nIDIV BX\nPUSH AX\n\n";
     }
     if(op=="%")
-    { code="POP BX\nPOP AX\nIDIV BX\nPUSH DX\n\n";
+    { code="MOV DX, 0\nPOP BX\nPOP AX\nIDIV BX\nPUSH DX\n\n";
     }
     return code;
 }
@@ -135,7 +135,10 @@ string binary_logicop(string op)
     { code="POP AX\nPOP BX\nOR AX, BX\nPUSH AX\n\n";
     }
     if(op=="&&")
-    { code="POP AX\nPOP BX\nAND AX, BX\nPUSH AX\n\n";
+    { 
+        string false_label=new_label();
+        string exit_label=new_label();
+        code="POP AX\nPOP BX\nCMP AX, 0\nJE "+false_label+"\nCMP BX, 0\nJE "+false_label+"\nPUSH 1\nJMP "+exit_label+"\n"+false_label+":\nPUSH 0\n"+exit_label+":\n\n";
     }
     return code;
 }
@@ -238,6 +241,11 @@ string parapass(vector<string> pids)
         code+="POP "+asm_name+"\n";
     }
     code+="PUSH AX\n";
+    return code;
+}
+string print()
+{
+    string code="POP NUMBER\nCALL PRINT_NUMBER\n\n";
     return code;
 }
 #endif

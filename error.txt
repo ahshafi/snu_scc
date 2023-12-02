@@ -1,1 +1,2 @@
-Total Error: 0
+Error at line 15: type mismatch in 1th argument in function_call: f
+Total Error: 1

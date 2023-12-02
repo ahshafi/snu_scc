@@ -118,6 +118,7 @@ func_definition : type_specifier ID LPAREN parameter_list RPAREN
 			process_function_definition($2->name, $1->name, $4->param, $4->pids);
 			
 			generate_declaration($4->pids);
+			code_seg+=";procedure begin\n";
 			code_seg+=$2->name+" PROC\n";
 			code_seg+=parapass($4->pids);
 			
@@ -129,17 +130,20 @@ func_definition : type_specifier ID LPAREN parameter_list RPAREN
 			$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$5->name+" "+$7->name;
 			rule_matched("func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement", $$->name);
 			
+			if($1->name=="void") code_seg+="PUSH 0\n";
+
 			if($2->name=="main") code_seg+="MOV AH, 4CH\nINT 21H\n\n";
 			else code_seg+=return_func();
 
 			code_seg+=$2->name+" ENDP\n";
 			if($2->name=="main") code_seg+="END MAIN\n";
+			code_seg+=";procedure end\n";
 		}
 		| type_specifier ID LPAREN RPAREN
 		{
 			//cout<<"faker\n";
 			process_function_definition($2->name, $1->name, vector<string>(), vector<string>());
-		
+			code_seg+=";procedure begin\n";
 			code_seg+=$2->name+" PROC\n";
 			if($2->name=="main") code_seg+="MOV AX, @DATA\nMOV DS, AX\n";
 		}
@@ -149,11 +153,14 @@ func_definition : type_specifier ID LPAREN parameter_list RPAREN
 			$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$6->name;
 			rule_matched("func_definition : type_specifier ID LPAREN RPAREN compound_statement", $$->name);
 			
+			if($1->name=="void") code_seg+="PUSH 0\n";
+
 			if($2->name=="main") code_seg+="MOV AH, 4CH\nINT 21H\n\n";
 			else code_seg+=return_func();
 
 			code_seg+=$2->name+" ENDP\n";
 			if($2->name=="main") code_seg+="END MAIN\n";
+			code_seg+=";procedure end\n";
 		}
 		
  		;				
@@ -375,6 +382,7 @@ simple_statement : var_declaration
 		code_seg+=jump(loop_label);
 		code_seg+=body_label+":\n";
 		forlabel.push(exit_label), forlabel.push(tail_label);
+		code_seg+=";loop body begin\n";
 	  }
 	  RPAREN simple_statement
 	  {
@@ -399,9 +407,12 @@ simple_statement : var_declaration
 	  	$$=new SymbolInfo();
 		$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$5->name;
 	  	rule_matched("simple_statement : IF LPAREN expression RPAREN simple_statement", $$->name);
+
+		code_seg+=";ifend\n";
 	  }
 	  | WHILE 
 	  {
+		code_seg+=";start while loop\n";
 		whilelabel.push(new_label());
 		code_seg+=whilelabel.top()+":\n";
 	  }
@@ -409,6 +420,7 @@ simple_statement : var_declaration
 	  {
 		whilelabel.push(new_label());
 		code_seg+=jump_if_false(whilelabel.top());
+		code_seg+=";loop body begin\n";
 	  }
 	  RPAREN simple_statement
 	  {
@@ -420,12 +432,15 @@ simple_statement : var_declaration
 		string loop_label=whilelabel.top(); whilelabel.pop();
 		code_seg+=jump(loop_label);
 		code_seg+=exit_label+":\n\n";
+		code_seg+=";end while loop\n";
 	  }
-	  | PRINTLN LPAREN ID RPAREN SEMICOLON
+	  | PRINTLN LPAREN expression RPAREN SEMICOLON
 	  {
 	  	$$=new SymbolInfo();
 		$$->name=$1->name+" "+$2->name+" "+$3->name+" "+$4->name+" "+$5->name;
 	  	rule_matched("simple_statement : PRINTLN LPAREN ID RPAREN SEMICOLON", $$->name);
+
+		code_seg+=print();
 	  }
 	  | RETURN expression SEMICOLON
 	  {
@@ -459,10 +474,12 @@ statement: simple_statement
 	  	
 		string exit_label=iflabel.top(); iflabel.pop();
 		code_seg+=exit_label+":\n\n";
+		code_seg+=";ifend\n";
 	  } 
  	;
 conditional_expression : expression
 			{
+				code_seg+=";ifbegin\n";
 				string exit_label=new_label();
 				string false_label=new_label();
 				iflabel.push(exit_label);
@@ -838,8 +855,51 @@ arguments : arguments COMMA logic_expression
 %%
 //asm code
 string initiation=".MODEL SMALL\n.STACK 100H\n";
-string data_seg=".DATA\n";
-string code_seg=".CODE\n";
+string data_seg=".DATA\nCR EQU 0DH\nLF EQU 0AH\nNEWLINE DB CR, LF, '$'\nNUMBER DW ?\nFLAG DW ?\n";
+string code_seg=".CODE\n\
+PRINT_NUMBER PROC  ;PRINT NUMBER STORED IN VARIABLE NUMBER\n\
+    MOV AX,NUMBER\n\
+    MOV FLAG,0\n\
+    CMP AX,0\n\
+    JGE AX_G_0\n\
+    NEG AX\n\
+    INC FLAG\n\ 
+    AX_G_0:\n\
+    \n\
+    MOV BX,10\n\
+    MOV DX,'M'\n\
+    PUSH DX\n\
+    XOR DX,DX\n\
+    NUMBER_LOOP:\n\
+        DIV BX\n\
+        PUSH DX\n\
+        XOR DX,DX\n\
+        CMP AX,0\n\
+        JNZ NUMBER_LOOP\n\
+    \n\
+    CMP FLAG,1\n\
+    JNE PRINTING_LOOP\n\
+    MOV AH,2\n\
+    MOV DL,'-'\n\
+    INT 21H\n\
+    \n\
+    PRINTING_LOOP:\n\
+        POP DX\n\
+        CMP DX,'M'\n\
+        JE END_PRINTING_LOOP\n\
+        ADD DL,'0'\n\
+        MOV AH,2\n\
+        INT 21H\n\
+        JMP PRINTING_LOOP\n\
+    \n\
+    END_PRINTING_LOOP:\n\ 
+    \n\
+    LEA DX, NEWLINE\n\
+    MOV AH, 9\n\
+    INT 21H \n\
+    \n\
+    RET\n\
+PRINT_NUMBER ENDP\n\n";
 string icg;
 //asm code
 void init()
@@ -869,7 +929,7 @@ int main(int argc, char* argv[])
 	st.exit();
 
 	icg=initiation+data_seg+code_seg;
-	cout<<icg;
+	gic<<icg;
 	return 0;
 }
 
